@@ -5,8 +5,10 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 // Minimum heap node
 struct MinHeapNode{
@@ -226,10 +228,24 @@ void compress(string sample){
     ofile.close();
 }
 
+std::ifstream::pos_type filesize(const char* filename)
+{
+    std::ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
+    return in.tellg(); 
+}
+
 int main(){
     // Actual compress
+    auto start = high_resolution_clock::now();
     compress("sample.xml");
+    auto stop = high_resolution_clock::now();
 
+    auto duration = duration_cast<microseconds>(stop - start);
+    
+    cout << "Minified XML file size (bytes)       : " << filesize("sample.xml") << endl;
+    cout << "Compressed XML file size (bytes)     : " << filesize("compressed.txt") << endl;
+    
+    cout << "Compress time duration (microseconds): " << duration.count() << endl;
     
     /*___________________________________________For Testing_____________________________________*/
     /*

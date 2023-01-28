@@ -8,49 +8,48 @@
 
 using namespace std;
 
-struct MinHeapNode{
+struct BinaryNode{
       char data;
-      int freq;
-      string code;
+      BinaryNode *left,*right;
 
-      MinHeapNode *left,*right;
-
-      MinHeapNode(char data){
+      BinaryNode(char data){
           left=right=NULL;
           this->data=data;
      }
 };
 
-void insert (MinHeapNode* root, char data, string code){
+// Insert every element to the binary tree
+void insert (BinaryNode* root, char data, string code){
     // Base case
     if(code == "0"){
-        MinHeapNode* node = new MinHeapNode(data);
+        BinaryNode* node = new BinaryNode(data);
         root->left = node;
     }
     else if(code == "1"){
-        MinHeapNode* node = new MinHeapNode(data);
+        BinaryNode* node = new BinaryNode(data);
         root->right = node;
     }
 
 
     if(code[0] == '0' && code.size() != 1){
         if(!root->left){
-            MinHeapNode* node = new MinHeapNode(code[0]);
+            BinaryNode* node = new BinaryNode(code[0]);
             root->left = node;
         }
         insert(root->left, data, code.substr(1));
     }
     else if(code[0] == '1' && code.size() != 1){
         if(!root->right){
-            MinHeapNode* node = new MinHeapNode(code[0]);
+            BinaryNode* node = new BinaryNode(code[0]);
             root->right = node;
         }
         insert(root->right, data, code.substr(1));
     }
 }
 
-MinHeapNode* HuffmanData(string s){
-    MinHeapNode* root = new MinHeapNode(NULL);
+// Get the data as a binary tree
+BinaryNode* BinaryData(string s){
+    BinaryNode* root = new BinaryNode(NULL);
     int i = 0;
     int size = s.size();
     while(i != size-1){
@@ -69,39 +68,44 @@ MinHeapNode* HuffmanData(string s){
     return root;
 }
 
-
-void treeTraversal(MinHeapNode* root){
+// For Testing
+void treeTraversal(BinaryNode* root){
     // Base case
     if(!root->left && !root->right){
         cout << root->data << endl;
     }
 
-    if(root->left)
+    if(root->left){
         treeTraversal(root->left);
-    if(root->right)
+    }
+    if(root->right){
         treeTraversal(root->right);
+    }
 }
 
-void getData(MinHeapNode* root, string& code, int level, string& s){
+// get the data by traversing the encoded data into the binary tree 
+void getData(BinaryNode* root, string& code, int level, string& s){
     // Base case
     if(!root->left && !root->right){
         string c (1,root->data);
         s.append(c);
+        return;
     }
 
     if(code[0] == '0' && root->left){
         code = code.substr(1);
         getData(root->left, code, level+1, s);
     }
-    if(code[0] == '1' && root->right){
+    else if(code[0] == '1' && root->right){
         code = code.substr(1);
         getData(root->right, code, level+1, s);
     }
     
-    if(level == 0 && code.size() != 0)
-        getData(root, code, 0, s);
+    if(level == -1 && code.size() != 0)
+        getData(root, code, -1, s);
 }
 
+// Convert the file frim hexadecimal to binary
 string toBinary(string hexadecimal){
     string out;
     for(int i = 0; i < hexadecimal.size(); i++){
@@ -162,30 +166,40 @@ string toBinary(string hexadecimal){
     return out;
 }
 
-int main(){
+// Decompress the file
+void decompress(string compressed){
     // Open file
     ifstream infile;
-    infile.open("compressed.txt");
+    infile.open(compressed);
     
     // Get the data codes
-    string s;
-    getline(infile,s);
+    string dataCodes;
+    getline(infile,dataCodes);
     
     // Put the data codes in the tree 
-    MinHeapNode* HuffmanTree = HuffmanData(s);
+    BinaryNode* BinaryTree = BinaryData(dataCodes);
     
+    //treeTraversal(HuffmanTree);
+
     // Get the encoded data
-    string encodedData =  "101110101";
-    //getline(infile,encodedData);
+    string encodedData;
+    getline(infile,encodedData);
     // convert it to binary
-    
+    encodedData = toBinary(encodedData);
     
     // Decode the data
     string data;
-    getData(HuffmanTree, encodedData, 0, data);
+    getData(BinaryTree, encodedData, -1, data);
     
-    // Print thr data
-    cout << data << endl;
+    // Finally, put the xml to the decompressed file 
+    ofstream ofile;
+    ofile.open("decompressed.txt");
+    ofile << data;
+    ofile.close();
+}
+
+int main(){
+    decompress("compressed.txt");
     system("pause");
     return 0;
 }

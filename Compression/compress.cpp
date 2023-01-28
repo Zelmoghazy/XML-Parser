@@ -136,28 +136,28 @@ string toHexadecimal(string binary){
         int sub = atoi(substring.c_str());
         switch (sub)
         {
-        case 0000:
+        case 0:
             out.append("0");
             break;
-        case 0001:
+        case 1:
             out.append("1");
             break;
-        case 0010:
+        case 10:
             out.append("2");
             break;
-        case 0011:
+        case 11:
             out.append("3");
             break;
-        case 0100:
+        case 100:
             out.append("4");
             break;
-        case 0101:
+        case 101:
             out.append("5");
             break;
-        case 0110:
+        case 110:
             out.append("6");
             break;
-        case 0111:
+        case 111:
             out.append("7");
             break;
         case 1000:
@@ -224,7 +224,7 @@ void compress(string sample){
     // Finally, put the data codes and the encoded data as a compressed file 
     ofstream ofile;
     ofile.open("compressed.txt");
-    ofile << dataCodes << ',' << endl << encodedData;
+    ofile << dataCodes << ',' << endl << toHexadecimal(encodedData);
     ofile.close();
 }
 

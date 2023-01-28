@@ -25,7 +25,7 @@ struct MinHeapNode{
      }
 };
 
-// compare the minimum value
+// Compare the minimum value
 struct compare{
 
     bool operator()(MinHeapNode *l,MinHeapNode *r)
@@ -63,7 +63,7 @@ string printCodes(struct MinHeapNode* root,string str){
    //If the node's data is not '$' that means it's not an internal node and print the string.
    if(!root->left && !root->right){
        string s(1,root->data); 
-       encodedDataInfo.append(s +":"+ str + ",");
+       encodedDataInfo.append(','+s +""+ str);
        root->code = str;
    }
 
@@ -224,7 +224,7 @@ void compress(string sample){
     // Finally, put the data codes and the encoded data as a compressed file 
     ofstream ofile;
     ofile.open("compressed.txt");
-    ofile << dataCodes << endl << toHexadecimal(encodedData);
+    ofile << dataCodes << ',' << endl << encodedData;
     ofile.close();
 }
 

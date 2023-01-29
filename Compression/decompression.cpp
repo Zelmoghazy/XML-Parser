@@ -1,13 +1,6 @@
-#include <iostream>
-#include <algorithm>
-#include <queue>
-#include <cstring>
-#include <string>
-#include <vector>
-#include <fstream>
+#include "decompression.h"
 
-using namespace std;
-
+// Binary node 
 struct BinaryNode{
       char data;
       BinaryNode *left,*right;
@@ -48,8 +41,8 @@ void insert (BinaryNode* root, char data, string code){
 }
 
 // Get the data as a binary tree
-BinaryNode* BinaryData(string s){
-    BinaryNode* root = new BinaryNode(NULL);
+BinaryNode* getBinaryTree(string s){
+    BinaryNode* root = new BinaryNode('$');
     int i = 0;
     int size = s.size();
     while(i != size-1){
@@ -105,85 +98,51 @@ void getData(BinaryNode* root, string& code, int level, string& s){
         getData(root, code, -1, s);
 }
 
-// Convert the file frim hexadecimal to binary
-string toBinary(string hexadecimal){
+// Convert the file from encoded to binary
+string toBinary(string encoded){
     string out;
-    for(int i = 0; i < hexadecimal.size(); i++){
-        switch (hexadecimal[i])
-        {
-        case '0':
-            out.append("0000");
-            break;
-        case '1':
-            out.append("0001");
-            break;
-        case '2':
-            out.append("0010");
-            break;
-        case '3':
-            out.append("0011");
-            break;
-        case '4':
-            out.append("0100");
-            break;
-        case '5':
-            out.append("0101");
-            break;
-        case '6':
-            out.append("0110");
-            break;
-        case '7':
-            out.append("0111");
-            break;
-        case '8':
-            out.append("1000");
-            break;
-        case '9':
-            out.append("1001");
-            break;
-        case 'A':
-            out.append("1010");
-            break;
-        case 'B':
-            out.append("1011");
-            break;
-        case 'C':
-            out.append("1100");
-            break;
-        case 'D':
-            out.append("1101");
-            break;
-        case 'E':
-            out.append("1110");
-            break;
-        case 'F':
-            out.append("1111");
-            break;
-        default:
-            break;
+    int condition = encoded[encoded.size()-1]-48;
+    int a = encoded.size();
+    for(int i = 0; i < encoded.size()-1; i++){
+        if(i < encoded.size()-condition-1){
+            encoded[i] = encoded[i] - 30;
+            std::bitset<7> b(encoded[i]);
+            out.append(b.to_string());
+        }else{
+            string s(1,encoded[i]);
+            out.append(s);
         }
     }
     return out;
 }
 
-// Decompress the file
+// Decompress Function
 void decompress(string compressed){
     // Open file
     ifstream infile;
     infile.open(compressed);
-    
-    // Get the data codes
+
     string dataCodes;
-    getline(infile,dataCodes);
+    string encodedData;
+
+    if(infile.is_open()){
+        // Get the data codes
+        getline(infile,dataCodes);
+        
+        // Get the encoded data
+        getline(infile, encodedData);
+
+        infile.close();
+    }
+    else{
+        cout << "Err" << endl;
+    }
     
     // Put the data codes in the tree 
-    BinaryNode* BinaryTree = BinaryData(dataCodes);
-    
-    //treeTraversal(HuffmanTree);
+    BinaryNode* BinaryTree = getBinaryTree(dataCodes);
 
-    // Get the encoded data
-    string encodedData;
-    getline(infile,encodedData);
+    
+    
     // convert it to binary
     encodedData = toBinary(encodedData);
     
@@ -193,13 +152,16 @@ void decompress(string compressed){
     
     // Finally, put the xml to the decompressed file 
     ofstream ofile;
-    ofile.open("decompressed.txt");
+    ofile.open("decompressed.xml");
     ofile << data;
     ofile.close();
 }
 
 int main(){
-    decompress("compressed.txt");
+    // To decompress
+    decompress("compressed.huf");
+    
     system("pause");
     return 0;
 }
+

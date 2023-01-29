@@ -1,14 +1,4 @@
-#include <iostream>
-#include <algorithm>
-#include <queue>
-#include <cstring>
-#include <string>
-#include <vector>
-#include <fstream>
-#include <chrono>
-
-using namespace std;
-using namespace std::chrono;
+#include "compression.h"
 
 // Minimum heap node
 struct MinHeapNode{
@@ -36,25 +26,26 @@ struct compare{
 
 
 // Get the data unique
-string getUniqueData(string data){
+string getUniqueData(string rawData){
     string uniqueData;
-    for(int i = 0; i < data.size(); i++){
-        if(uniqueData.find(data[i]) == string::npos){
-            uniqueData.push_back(data[i]);
+    for(int i = 0; i < rawData.size(); i++){
+        if(uniqueData.find(rawData[i]) == string::npos){
+            uniqueData.push_back(rawData[i]);
         }
     }
     return uniqueData;
 }
 
 // Get the frequency of data
-void getFrequency(string uniqueData, string data, vector<int>& v){
+void getFrequency(string uniqueData, string rawData, vector<int>& freq){
     for(int i = 0; i < uniqueData.size(); i++){
-        int x = count(data.begin(), data.end(), uniqueData[i]);
-        v.push_back(x);
+        int x = count(rawData.begin(), rawData.end(), uniqueData[i]);
+        freq.push_back(x);
     }
 }
 
-string printCodes(struct MinHeapNode* root,string str){
+// Put the code for every character
+string printCodes(struct MinHeapNode* root,string code){
    static string encodedDataInfo;
    //If root is Null then return.
    if(!root){
@@ -63,26 +54,26 @@ string printCodes(struct MinHeapNode* root,string str){
    //If the node's data is not '$' that means it's not an internal node and print the string.
    if(!root->left && !root->right){
        string s(1,root->data); 
-       encodedDataInfo.append(','+s +""+ str);
-       root->code = str;
+       encodedDataInfo.append(','+s + code);
+       root->code = code;
    }
 
-   printCodes(root->left,str+"0");
-   printCodes(root->right,str+"1");
+   printCodes(root->left,code+"0");
+   printCodes(root->right,code+"1");
    return encodedDataInfo;
 }
 
+
+// Make the huffman tree
 MinHeapNode* HuffmanCodes(string data, vector<int>& freq, int size){
 
 struct MinHeapNode *left,*right,*top;
 
 //create a min heap.
 priority_queue<MinHeapNode*,vector<MinHeapNode*>,compare> minheap;
+    
 
-    //get the data and frequency
-    
 // For each character create a leaf node and insert each leaf node in the heap.
-    
 
 for(int i=0;i<size;i++){
     minheap.push(new MinHeapNode(data[i], freq.at(i)));
@@ -108,6 +99,7 @@ for(int i=0;i<size;i++){
     return minheap.top();
 }
 
+// Get the code a single character
 string getCode(char data,struct MinHeapNode* root){
     if(!root){
         return "";
@@ -121,76 +113,33 @@ string getCode(char data,struct MinHeapNode* root){
        return  getCode(data, root->right);
 }
 
-string encodeData(string data, struct MinHeapNode* root){
+// Encode the XML file to binary by huffman algorithm
+string encodeDataToBinary(string rawData, struct MinHeapNode* root){
     string encodedData;
-    for(int i = 0; i < data.size();i++){
-        encodedData.append(getCode(data[i],root));
+    for(int i = 0; i < rawData.size();i++){
+        encodedData.append(getCode(rawData[i],root));
     }
     return encodedData;
 }
 
-string toHexadecimal(string binary){
-    string substring,out;
-    for(int i = 0; i < binary.size(); i+=4){
-        substring = binary.substr(i,4);
-        int sub = atoi(substring.c_str());
-        switch (sub)
-        {
-        case 0:
-            out.append("0");
-            break;
-        case 1:
-            out.append("1");
-            break;
-        case 10:
-            out.append("2");
-            break;
-        case 11:
-            out.append("3");
-            break;
-        case 100:
-            out.append("4");
-            break;
-        case 101:
-            out.append("5");
-            break;
-        case 110:
-            out.append("6");
-            break;
-        case 111:
-            out.append("7");
-            break;
-        case 1000:
-            out.append("8");
-            break;
-        case 1001:
-            out.append("9");
-            break;
-        case 1010:
-            out.append("A");
-            break;
-        case 1011:
-            out.append("B");
-            break;
-        case 1100:
-            out.append("C");
-            break;
-        case 1101:
-            out.append("D");
-            break;
-        case 1110:
-            out.append("E");
-            break;
-        case 1111:
-            out.append("F");
-            break;
-        default:
+
+// Compress the binary data
+void compressBinaryData(string binary, ofstream& f){
+    string substring;
+    for(int i = 0; i < binary.size(); i+=7){
+        if(binary.size() - i < 7){
+            substring = binary.substr(i,binary.size() - i);
             break;
         }
+       bitset<7>  b(binary.substr(i,7));
+        unsigned char c = static_cast<unsigned char>(b.to_ulong());
+        c = c+30;
+        f<<c;
     }
-    return out;
+    f<<substring<<substring.size();
 }
 
+// Compress Function
 void compress(string sample){
     string data;
     ifstream f;
@@ -219,15 +168,18 @@ void compress(string sample){
     dataCodes.append(printCodes(HuffmanTree,""));
 
     // Get the data encoded
-    string encodedData  = encodeData(data,HuffmanTree);
+    string encodedData  = encodeDataToBinary(data,HuffmanTree);
 
     // Finally, put the data codes and the encoded data as a compressed file 
     ofstream ofile;
-    ofile.open("compressed.txt");
-    ofile << dataCodes << ',' << endl << toHexadecimal(encodedData);
+    ofile.open("compressed.huf");
+    ofile << dataCodes << "," << endl;
+    compressBinaryData(encodedData, ofile);
+    
     ofile.close();
 }
 
+// Get the size of the file
 std::ifstream::pos_type filesize(const char* filename)
 {
     std::ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
@@ -235,19 +187,21 @@ std::ifstream::pos_type filesize(const char* filename)
 }
 
 int main(){
-    // Actual compress
+    // To compress
+        // Get the time
     auto start = high_resolution_clock::now();
     compress("sample.xml");
     auto stop = high_resolution_clock::now();
 
     auto duration = duration_cast<microseconds>(stop - start);
     
+        // Print the time duration and size
     cout << "Minified XML file size (bytes)       : " << filesize("sample.xml") << endl;
-    cout << "Compressed XML file size (bytes)     : " << filesize("compressed.txt") << endl;
+    cout << "Compressed XML file size (bytes)     : " << filesize("compressed.huf") << endl;
     
     cout << "Compress time duration (microseconds): " << duration.count() << endl;
-    
-    /*___________________________________________For Testing_____________________________________*/
+
+    /*_____________________________________Compression For Testing_____________________________________*/
     /*
     cout <<"########################## getUniqueData() Testing ############################" << endl;
 
@@ -261,7 +215,6 @@ int main(){
     sort(uniqueData.begin(),uniqueData.end());
     
 
-   
 
     cout <<"########################## getFrequency() Testing ############################" << endl;
 
@@ -273,6 +226,7 @@ int main(){
     }
     cout << "\n" <<  endl;
 
+
     cout << "########################## HuffmanCodes() Testing ############################" << endl;
     
     MinHeapNode* HuffmanTree = HuffmanCodes(uniqueData, frequencyData, uniqueData.size());
@@ -281,9 +235,9 @@ int main(){
     cout << dataCodes << endl;
 
     
-    cout << "########################## encodeData() Testing ############################" << endl;
+    cout << "########################## encodeDataToBinary() Testing ############################" << endl;
     cout << "Raw data : " << data << endl;
-    string encodedData  = encodeData(data,HuffmanTree);
+    string encodedData  = encodeDataToBinary(data,HuffmanTree);
     cout << "Encoded data : " << toHexadecimal(encodedData) << endl;
     */
 

@@ -44,6 +44,16 @@ private slots:
 
     void on_InputText_textChanged();
 
+    void on_minify_button_clicked();
+
+    void on_toJson_clicked();
+
+    void on_outputpretify_undoAvailable(bool b);
+
+    void on_page_customContextMenuRequested(const QPoint &pos);
+
+    void on_back_button_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

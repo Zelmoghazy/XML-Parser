@@ -1,6 +1,6 @@
 #include "mainwindow.h"
-
 #include <QApplication>
+#include "xmlparser.h"
 
 int main(int argc, char *argv[])
 {

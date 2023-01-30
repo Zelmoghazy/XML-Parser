@@ -67,7 +67,6 @@ public:
     }
     bool checkBalance(std::string source, int n)
     {
-        int flag = 0;
         int opening = 0;
         int closing = 0;
         std::stack<int> s;
@@ -89,7 +88,7 @@ public:
             {
                 if (s.empty())
                 {
-                    flag++;
+                    return false;
                 }
                 else if (s.top() == '<')
                 {
@@ -97,7 +96,7 @@ public:
                 }
             }
         }
-        if (flag != 0 || (closing - opening) != 0)
+        if (closing - opening != 0)
         {
             return false;
         }
@@ -139,17 +138,6 @@ public:
         // null terminate
         source[size] = '\0';
 
-        // check consistency
-        if (checkBalance(source, size))
-        {
-            printf("the xml is balanced\n");
-        }
-        else
-        {
-            printf("The XML is not balanced\n");
-            // Abdo add return
-        }
-
         // Create new root node (no parent)
         //------------------------------//
         this->root = new XMLNode(root);
@@ -162,6 +150,17 @@ public:
 
         // first node to work with is the doc root node
         XMLNode *curr_node = this->root;
+        
+         // check consistency
+        if (checkBalance(source, size))
+        {
+            printf("the xml is balanced\n");
+        }
+        else
+        {
+            printf("The XML is not balanced\n");
+            // Abdo add return
+        }
 
         // Parsing loop (Seperate function)
         // as long as we dont reach end of source array
@@ -208,19 +207,7 @@ public:
                     if (strcmp(curr_node->tag, buffer))
                     {
                         fprintf(stderr, "Mismatched tags (%s != %s)\n", curr_node->tag, buffer);
-                        char choice;
-                        printf("Do you want to correct the error and match with %s tag: enter 'y' or 'n' ", curr_node->tag);
-                        scanf(" %c", &choice);
-                        // Correct mismatched tags
-                        if (choice == 'y')
-                        {
-                            // buffer = strdup(curr_node->tag);
-                        }
-                        else
-                        {
-                            free(curr_node); //???????????????????
-                            return false;
-                        }
+                        return false;
                     }
                     // If they match we are done move to parent
                     curr_node = curr_node->parent;

@@ -19,7 +19,8 @@ set(PROJECT_SOURCES
         mainwindow.ui
         xmlparser.cpp
         xmlparser.h
-
+        compressionDecompression.h
+        compressionDecompression.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

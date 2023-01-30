@@ -16,7 +16,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
 
     void on_pushButton_3_clicked();
 
@@ -28,9 +27,6 @@ private slots:
 
     void on_pushButton_6_clicked();
 
-    void on_pushButton_7_pressed();
-
-    void on_pushButton_7_clicked();
 
     void on_pretty_button_clicked();
 
@@ -48,11 +44,9 @@ private slots:
 
     void on_toJson_clicked();
 
-    void on_outputpretify_undoAvailable(bool b);
+   void on_back_button_clicked();
 
-    void on_page_customContextMenuRequested(const QPoint &pos);
-
-    void on_back_button_clicked();
+    void on_CheckErrors_clicked();
 
 private:
     Ui::MainWindow *ui;

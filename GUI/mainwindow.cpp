@@ -10,7 +10,7 @@
 #include "xmlparser.h"
 #include <fstream>
 #include <fstream>
-
+#include "compressionDecompression.h"
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -52,6 +52,8 @@ void MainWindow::on_pushButton_5_clicked()
 void MainWindow::on_pushButton_6_clicked()
 {
     QApplication::quit();
+
+
 }
 
 
@@ -66,7 +68,6 @@ void MainWindow::on_pretty_button_clicked()
 
     XMLDocument doc;
     // loading
-    cout<<XMLDocument_load(&doc,"test.xml");
 
     if(!XMLDocument_load(&doc,"C:\\Users\\hp\\Desktop\\Mans1611\\University\\Datas\\project\\GUI\\test.xml")){
         cout<<"fail"<<endl;
@@ -77,7 +78,8 @@ void MainWindow::on_pretty_button_clicked()
     XMLDocument_free (&doc);
 
        ui->screen3_label->setText("Pretitfied Json");
-       QFile file("out.xml");
+
+       QFile file("C:\\Users\\hp\\Desktop\\Mans1611\\University\\Datas\\project\\GUI\\out.xml");
        if(!file.open(QIODevice::ReadOnly)) {
            QMessageBox::information(0, "error", file.errorString());
        }
@@ -87,7 +89,6 @@ void MainWindow::on_pretty_button_clicked()
             line +=  in.readLine() + "\n";
             ui->prettified_label->setText(line);
        }
-
        file.close();
 
 
@@ -108,13 +109,53 @@ void MainWindow::on_ConvertJson_2_clicked()
 
 void MainWindow::on_Decompress_clicked()
 {
-      cout<<"decompress button"<<endl;
+    decompress("C:\\Users\\hp\\Desktop\\Mans1611\\University\\Datas\\project\\GUI\\compressed.huf");
+    ui->stackedWidget->setCurrentIndex(2);
+    ui->screen3_label->setText("Decompressed File");
+    XMLDocument doc;
+    // loading
+
+
+    if(!XMLDocument_load(&doc,"C:\\Users\\hp\\Desktop\\Mans1611\\University\\Datas\\project\\GUI\\decompressed.xml")){
+        cout<<"fail"<<endl;
+    }
+    XMLDocument_write(&doc,"C:\\Users\\hp\\Desktop\\Mans1611\\University\\Datas\\project\\GUI\\decompressed.xml",'f');
+    XMLDocument_free (&doc);
+
+   QFile file("C:\\Users\\hp\\Desktop\\Mans1611\\University\\Datas\\project\\GUI\\decompressed.xml");
+   if(!file.open(QIODevice::ReadOnly)) {
+       QMessageBox::information(0, "error", file.errorString());
+   }
+   QTextStream in(&file);
+   QString line;
+   while(!in.atEnd()) {
+        line +=  in.readLine() + "\n";
+        ui->prettified_label->setText(line);
+   }
+   file.close();
+
+
 }
 
 
 void MainWindow::on_Compress_clicked()
 {
-    cout<<"compress button"<<endl;
+    compress("C:\\Users\\hp\\Desktop\\Mans1611\\University\\Datas\\project\\GUI\\out.xml");
+    ui->stackedWidget->setCurrentIndex(2);
+   ui->screen3_label->setText("Compressed File");
+
+   QFile file("C:\\Users\\hp\\Desktop\\Mans1611\\University\\Datas\\project\\GUI\\compressed.huf");
+   if(!file.open(QIODevice::ReadOnly)) {
+       QMessageBox::information(0, "error", file.errorString());
+   }
+
+   QTextStream in(&file);
+   QString line;
+   while(!in.atEnd()) {
+        line +=  in.readLine() + "\n";
+        ui->prettified_label->setText(line);
+   }
+   file.close();
 
 }
 
@@ -166,10 +207,12 @@ void MainWindow::on_minify_button_clicked()
         QMessageBox::information(0, "error", file.errorString());
     }
     QTextStream in(&file);
-     QString line;
+    QString line;
     while(!in.atEnd()) {
-         line +=  in.readLine();
-         ui->prettified_label->setText(line);
+
+        line += in.readLine();
+        ui->prettified_label->setText(line);
+
     }
 
     file.close();
@@ -215,5 +258,21 @@ void MainWindow::on_toJson_clicked()
 void MainWindow::on_back_button_clicked()
 {
      ui->stackedWidget->setCurrentIndex(1);
+}
+
+
+void MainWindow::on_CheckErrors_clicked()
+{
+
+    XMLDocument doc;
+
+    // loading
+    if(!XMLDocument_load(&doc,"C:\\Users\\hp\\Desktop\\Mans1611\\University\\Datas\\project\\GUI\\test.xml")){
+        cout<<"fail"<<endl;
+    }
+    XMLDocument_write(&doc,"C:\\Users\\hp\\Desktop\\Mans1611\\University\\Datas\\project\\GUI\\out.xml",'f');
+    XMLDocument_free (&doc);
+
+
 }
 

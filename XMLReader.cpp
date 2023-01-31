@@ -96,11 +96,7 @@ public:
                 }
             }
         }
-        if (closing - opening != 0)
-        {
-            return false;
-        }
-        else if (s.empty() && (closing - opening) == 0)
+        if (s.empty() && (closing - opening) == 0)
         {
             return true;
         }

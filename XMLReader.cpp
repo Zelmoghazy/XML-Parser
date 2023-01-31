@@ -159,7 +159,7 @@ public:
         else
         {
             printf("The XML is not balanced\n");
-            // Abdo add return
+            return false;
         }
 
         // Parsing loop (Seperate function)

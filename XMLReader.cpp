@@ -231,6 +231,22 @@ public:
                         continue;
                     }
                 }
+                // XML Version Node <?>
+                if (source[i + 1] == '?')
+                {
+                    while (source[i] != '>')
+                    {
+                        if (buffer[buffer_index - 1] == ' ')
+                        {
+                            // dont pickup space
+                            buffer_index--;
+                            continue;
+                        }
+                    buffer[buffer_index++] = source[i++];
+                    }
+                    buffer[buffer_index] = '\0';
+                    continue;
+                }
 
                 // Create a new node with the current node being the parent
                 //------------------------------//

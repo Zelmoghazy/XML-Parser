@@ -74,6 +74,14 @@ public:
         {
             if (source[i] == '<')
             {
+                if (source[i + 1] == '!' || source[i + 1] == '?')
+                {
+                    while (source[i] != '>')
+                    {
+                        i++;
+                    }
+                    continue;
+                }
                 s.push('<');
                 if (source[i + 1] == '/')
                 {

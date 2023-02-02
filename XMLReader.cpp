@@ -74,6 +74,14 @@ public:
         {
             if (source[i] == '<')
             {
+                if (source[i + 1] == '!' || source[i + 1] == '?')
+                {
+                    while (source[i] != '>')
+                    {
+                        i++;
+                    }
+                    continue;
+                }
                 s.push('<');
                 if (source[i + 1] == '/')
                 {
@@ -96,11 +104,7 @@ public:
                 }
             }
         }
-        if (closing - opening != 0)
-        {
-            return false;
-        }
-        else if (s.empty() && (closing - opening) == 0)
+        if (s.empty() && (closing - opening) == 0)
         {
             return true;
         }
@@ -159,7 +163,7 @@ public:
         else
         {
             printf("The XML is not balanced\n");
-            // Abdo add return
+            return false;
         }
 
         // Parsing loop (Seperate function)
@@ -234,6 +238,22 @@ public:
                     {
                         continue;
                     }
+                }
+                // XML Version Node <?>
+                if (source[i + 1] == '?')
+                {
+                    while (source[i] != '>')
+                    {
+                        if (buffer[buffer_index - 1] == ' ')
+                        {
+                            // dont pickup space
+                            buffer_index--;
+                            continue;
+                        }
+                    buffer[buffer_index++] = source[i++];
+                    }
+                    buffer[buffer_index] = '\0';
+                    continue;
                 }
 
                 // Create a new node with the current node being the parent

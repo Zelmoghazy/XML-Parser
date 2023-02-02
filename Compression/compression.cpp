@@ -51,7 +51,7 @@ string printCodes(struct MinHeapNode* root,string code){
    if(!root){
        return "";
    }
-   //If the node's data is not '$' that means it's not an internal node and print the string.
+
    if(!root->left && !root->right){
        string s(1,root->data); 
        encodedDataInfo.append(','+s + code);
@@ -101,20 +101,27 @@ for(int i=0;i<size;i++){
 
 // Get the code a single character
 string getCode(char data,struct MinHeapNode* root){
+    //If root is Null then return.
     if(!root){
         return "";
     }
+
     if(root->data == data){
         return root->code;
     }
     if(getCode(data, root->left) != ""){
-       return  getCode(data, root->left);
+    return  getCode(data, root->left);
     }
-       return  getCode(data, root->right);
+    return  getCode(data, root->right);
 }
 
 // Encode the XML file to binary by huffman algorithm
 string encodeDataToBinary(string rawData, struct MinHeapNode* root){
+    //If root is Null then return.
+    if(!root){
+        return "";
+    }
+
     string encodedData;
     for(int i = 0; i < rawData.size();i++){
         encodedData.append(getCode(rawData[i],root));
@@ -186,7 +193,7 @@ std::ifstream::pos_type filesize(const char* filename)
     return in.tellg(); 
 }
 
-int main(){
+/*int main(){
     // To compress
         // Get the time
     auto start = high_resolution_clock::now();
@@ -239,8 +246,8 @@ int main(){
     cout << "Raw data : " << data << endl;
     string encodedData  = encodeDataToBinary(data,HuffmanTree);
     cout << "Encoded data : " << toHexadecimal(encodedData) << endl;
-    */
+    
 
     system("pause");
     return 0;
-}
+}*/

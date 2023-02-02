@@ -13,6 +13,11 @@ struct BinaryNode{
 
 // Insert every element to the binary tree
 void insert (BinaryNode* root, char data, string code){
+    //If root is Null then return.
+    if(!root){
+        return;
+    }
+
     // Base case
     if(code == "0"){
         BinaryNode* node = new BinaryNode(data);
@@ -63,6 +68,11 @@ BinaryNode* getBinaryTree(string s){
 
 // For Testing
 void treeTraversal(BinaryNode* root){
+    //If root is Null then return.
+    if(!root){
+        return;
+    }
+
     // Base case
     if(!root->left && !root->right){
         cout << root->data << endl;
@@ -78,6 +88,11 @@ void treeTraversal(BinaryNode* root){
 
 // get the data by traversing the encoded data into the binary tree 
 void getData(BinaryNode* root, string& code, int level, string& s){
+    //If root is Null then return.
+    if(!root){
+        return;
+    }
+
     // Base case
     if(!root->left && !root->right){
         string c (1,root->data);

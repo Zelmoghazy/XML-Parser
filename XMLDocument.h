@@ -29,4 +29,5 @@ public:
     Graph constructGraph(XMLNode* );
     bool are_same_children(XMLNode *);
     void JSON(FILE *, XMLNode *, int,int);
+    Graph constructGraph(XMLNode* );
 };

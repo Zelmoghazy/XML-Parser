@@ -55,4 +55,17 @@ Due to differences between xml files and Json, we marked each node if it had chi
 - Post Search
 
 It simply takes a word or sub string as an argument and searches in the whole posts in the network to get a post containing this word or a topic speaking about this word and returns a vector containing all posts related. 
+# Graph
+![image](https://user-images.githubusercontent.com/104307082/216669845-bd01cd55-9a3f-4408-b88f-5fd90940de60.png)
+
+The graph is constructed by invoking constructGraph method located in XMLDocument class which creates a graph object with number of vertices equal to number of users and start filling up the adjacency matrix depending on follower dependencies between users, finally convert the adjacency matrix into a visualized graph representing the relationships between users.
+
+With the graph visualized in the screen we also show some statistics like most active user, and most influencer user.
+
+- mutual followers between two users:
+
+taking two users id as parameters and returns the mutual users id.
+- suggest a list of users to follow:
+
+for a given user it iterates for his followers and search for a follower that is not a follower of the given node and returns a vector of suggested followers.
 

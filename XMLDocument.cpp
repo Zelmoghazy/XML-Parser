@@ -1,4 +1,5 @@
 #include "XMLDocument.h"
+#include "Graph.h"
 
 XMLDocument::XMLDocument(/* args */)
 {
@@ -703,4 +704,38 @@ void XMLDocument::printFamousNode(XMLNode* root)
     }
     XMLNode* famous = getFamousNode(root);
     std::cout<<"the most famous user is: "<<famous->children[0]->inner_text<<std::endl;
+}
+
+Graph XMLDocument::constructGraph(XMLNode* root)
+{
+    //create a graph with n users
+    Graph g(root->children.size());
+    //add edges to the graph
+    for (XMLNode* child : root->children)
+    {
+        int j = 0;
+        //get index of followers
+        for (XMLNode* children : child->children){
+            char* tag = children->tag;
+            if(tag[0] == 'f' || tag[0] == 'F')
+                break;
+            j++;
+        }
+        XMLNode* followers = child->children[j];
+        if(!followers)
+            continue;
+        
+        for (XMLNode* follower : followers->children)
+        {
+            XMLNode* id =  child->children[0];
+            XMLNode* follower_id = follower->children[0];
+            g.add_edge(atoi(id->inner_text) -1, atoi(follower_id->inner_text)-1);
+        }
+    }
+    if (!g.Dotwrite("test.dot"))
+    {
+        printf("Error");
+    }
+    system("dot -Tpng -O test.dot");
+    return g;
 }

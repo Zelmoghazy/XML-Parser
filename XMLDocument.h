@@ -9,7 +9,7 @@ public:
     XMLDocument(/* args */);
     ~XMLDocument();
     XMLNode* get_users();
-    XMLNode* get_user(unsigned int id);
+    XMLNode* get_user(unsigned int);
     bool checkBalance(std::string, int);
     bool XMLDocument_load(const char *);
     void Format(FILE *, XMLNode *, int, int );
@@ -27,6 +27,6 @@ public:
     XMLNode* getFamousNode(XMLNode*);
     void printFamousNode(XMLNode* );
     Graph constructGraph(XMLNode* );
-    bool are_same_children(XMLNode *parent);
-    void JSON(FILE *file, XMLNode *node, int indent, int times);
+    bool are_same_children(XMLNode *);
+    void JSON(FILE *, XMLNode *, int,int);
 };

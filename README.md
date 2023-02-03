@@ -25,3 +25,9 @@ All these functionalities should be accessed from a GUI
 "GUI" folder includes:
 -	Codes regarding GUI.
 
+##Algorithm
+![image](https://user-images.githubusercontent.com/104307082/216668671-b0606115-2803-42f2-bce9-a3abe6b01d83.png)
+
+#First:
+You can write an XML code in the text area shown or you can load an XML file by pressing on choose file button.
+

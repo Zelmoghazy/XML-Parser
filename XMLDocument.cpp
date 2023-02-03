@@ -66,7 +66,7 @@ bool XMLDocument::checkBalance(std::string source, int n)
     return false;
 }
 
-bool XMLDocument::XMLDocument_load(const char *path)
+bool XMLDocument::XMLDocument_parse(const char *path)
 {
     FILE *file = fopen(path, "r");
     // Check if file loads properly

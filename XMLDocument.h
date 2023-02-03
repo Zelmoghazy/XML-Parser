@@ -11,7 +11,7 @@ public:
     XMLNode* get_users();
     XMLNode* get_user(unsigned int);
     bool checkBalance(std::string, int);
-    bool XMLDocument_load(const char *);
+    bool XMLDocument_parse(const char *);
     void Format(FILE *, XMLNode *, int, int );
     void Minify(FILE *, XMLNode *);
     bool XMLDocument_write(const char *, const char);

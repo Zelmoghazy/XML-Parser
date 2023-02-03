@@ -66,6 +66,377 @@ bool XMLDocument::checkBalance(std::string source, int n)
     return false;
 }
 
+bool XMLDocument::XMLDocument_load(const char *path)
+{
+    FILE *file = fopen(path, "r");
+    // Check if file loads properly
+    if (!file)
+    {
+        // output to stderr to seperate error messages from regular output
+        fprintf(stderr, "Couldnt load file");
+        return false;
+    }
+    std::string source;
+    int size = 1;
+    char ch;
+    // count number of new lines
+    //  a new line is represented by two bytes in a text file,
+    //  but when reading it only yields a single '\n' character.
+    while (file)
+    {
+        ch = fgetc(file);
+        if (ch == EOF)
+            break;
+        source.push_back(ch);
+        size++;
+    }
+    fread(&source[0], 1, size, file);
+    fclose(file);
+    /*-----------------------------------------------------*/
+    // null terminate
+    source[size] = '\0';
+    // Create new root node (no parent)
+    //------------------------------//
+    this->root = new XMLNode(root);
+    // char array to extract information (Vector in c++)
+    char buffer[2560];
+    // index to control the buffer array
+    int buffer_index = 0;
+    // index of source array
+    int i = 0;
+    // first node to work with is the doc root node
+    XMLNode *curr_node = this->root;
+    
+     // check consistency
+    if (checkBalance(source, size))
+    {
+        printf("the xml is balanced\n");
+    }
+    else
+    {
+        printf("The XML is not balanced\n");
+        //return false;
+    }
+    // Parsing loop (Seperate function)
+    // as long as we dont reach end of source array
+    while (source[i] != '\0')
+    {
+        
+        // if we find an open tag
+        if (source[i] == '<')
+        {
+            // Reset the buffer
+            buffer[buffer_index] = '\0';
+            // Inner Text
+            // If buffer index is not zero then there is inner text
+            if (buffer_index > 0)
+            {
+                // Append extracted inner text to our buffer and make note of size
+                curr_node->inner_text_size += buffer_index;
+                curr_node->inner_text = strdup(buffer);
+                // reset buffer index
+                buffer_index = 0;
+            }
+            // End of node
+            // Comments and special nodes <!--->
+            if (source[i + 1] == '!')
+            {
+                while (source[i] != '>')
+                {
+                    if (buffer[buffer_index - 1] == ' ')
+                    {
+                        // dont pickup space
+                        buffer_index--;
+                        continue;
+                    }
+                    buffer[buffer_index++] = source[i++];
+                }
+                buffer[buffer_index] = '\0';
+                // Comments
+                if (buffer[buffer_index - 1] == '-' && buffer[buffer_index - 2] == '-')
+                {
+                    continue;
+                }
+            }else if (source[i + 1] == '?')
+            {
+                i++;
+                char start = source[i];
+                while (source[++i]!= '?');
+                char end = source[i];
+                if (start != end )
+                {
+                    std::cout<<"invalid header!!";
+                    return false;
+                }
+                while (source[i]!= '<'){i++;}
+            }
+            // if we find a '/' after '<' we are at the end of node
+            else if (source[i + 1] == '/')
+            {
+                // move two positions <,/
+                i += 2;
+                // while we havent reached end tag append to buffer
+                while (source[i] != '>')
+                {
+                    buffer[buffer_index++] = source[i++];
+                }
+                // once we reach end tag add null termination to denote the extracted string
+                buffer[buffer_index] = '\0';
+                // If current Node is NULL it means only end tag is there
+                if (!curr_node->tag)
+                {
+                    fprintf(stderr, "Missing start tag\n");
+                    free(curr_node);
+                    return false;
+                }
+                // Check if tags match
+                // strcmp returns 0 if they match
+                if (strcmp(curr_node->tag, buffer))
+                {
+                    fprintf(stderr, "Mismatched tags (%s != %s)\n", curr_node->tag, buffer);
+                    return false;
+                }
+                // If they match we are done move to parent
+                curr_node = curr_node->parent;
+                buffer_index = 0;
+                i++;
+                continue;
+            }
+            
+            // Create a new node with the current node being the parent
+            //------------------------------//
+            curr_node = new XMLNode(curr_node);
+            // Start Tag
+            // increment where we are in the source
+            i++;
+            // While we havent reached the end tag
+            while (source[i] != '>')
+            {
+                // add the data to the buffer
+                buffer[buffer_index++] = source[i++];
+                // <tag  >
+                // if we find a space and we still dont have a tag
+                // skip space and set tag
+                if (source[i] == ' ' && !curr_node->tag)
+                {
+                    // denote the end of extracted string
+                    buffer[buffer_index] = '\0';
+                    // set the tag
+                    curr_node->tag = strdup(buffer);
+                    // reset buffer index
+                    buffer_index = 0;
+                    i++;
+                    continue;
+                }
+                // if last character is space
+                // ignore other spaces
+                if (buffer[buffer_index - 1] == ' ')
+                {
+                    // dont pickup space
+                    buffer_index--;
+                    continue;
+                }
+            }
+            //<tag>inner text
+            // set tag name if it doesnt exist
+            buffer[buffer_index] = '\0';
+            if (!curr_node->tag)
+            {
+                curr_node->tag = strdup(buffer);
+            }
+            // Reset
+            buffer_index = 0; // reset
+            i++;
+            continue;
+        }
+        else
+        // if not inside tag
+        // keep appending inner text to the buffer
+        {
+            if (source[i] == '\n')
+            {
+                i++;
+                // found white space after newline
+                while (source[i] == ' ')
+                {
+                    // ignore white space dont add to buffer
+                    i++;
+                }
+            }
+            else
+            {
+                buffer[buffer_index++] = source[i++];
+            }
+        }
+    }
+    // if current node is NULL and the index is not zero then there is an outside text
+    if (buffer_index > 0 && curr_node->tag == NULL)
+    {
+        fprintf(stderr, "text outside of document\n");
+        free(curr_node); //????????????
+        return false;
+    }
+    else if (curr_node->tag)
+    {
+        fprintf(stderr, "missing end tag/tags\n");
+        if(buffer_index > 0){
+            buffer[buffer_index] = '\0';
+            // Append extracted inner text to our buffer and make note of size
+            curr_node->inner_text_size += buffer_index;
+            curr_node->inner_text = strdup(buffer);
+        }
+        while(curr_node->parent)
+            curr_node = curr_node->parent;
+        //return false;
+    }
+    this->root = curr_node;
+    return true;
+}
+
+bool XMLDocument::are_same_children(XMLNode *parent)
+{
+    bool mark = false;
+    int counter = 0;
+    for (int i = 0; i < parent->children.size() - 1; i++)
+    {
+        if (strcmp(parent->children[i]->tag, parent->children[i + 1]->tag))
+        {
+            counter++;
+            continue;
+        }
+        else
+        {
+            if (mark == false)
+            {
+                parent->children[i]->flag = 2;
+                if (i == (int)parent->children.size() - 2)
+                {
+                    parent->children[i + 1]->flag = 4;
+                }
+                else
+                {
+                    parent->children[i + 1]->flag = 1;
+                }
+                mark = true;
+            }
+            else
+            {
+                parent->children[i]->flag = 1;
+                if (i == (int)parent->children.size() - 2)
+                {
+                    parent->children[i + 1]->flag = 4;
+                }
+                else
+                {
+                    parent->children[i + 1]->flag = 1;
+                }
+            }
+        }
+    }
+    if (counter == parent->children.size() - 1 && parent->children.size() != 1)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+void XMLDocument::JSON(FILE *file, XMLNode *node, int indent, int times)
+{
+
+    for (int i = 0; i < node->children.size(); i++)
+    {
+        XMLNode *child = node->children[i];
+        if (times > 0)
+        {
+            fprintf(file, "%0*s", indent * times, " ");
+        }
+        if (child->children.size() == 0)
+        {
+            if (child->flag == 2)
+            {
+                fprintf(file, "\"%s\":[\n", child->tag);
+                fprintf(file, "%0*s", indent * times, " ");
+            }
+
+            if (child->flag != 1 && child->flag != 4 && child->flag != 2)
+            {
+                if (i == 0 && child->parent->flag != 3)
+                {
+                    fprintf(file, "{\n");
+                    fprintf(file, "%0*s", indent * times, " ");
+                }
+                fprintf(file, "\"%s\": ", child->tag);
+            }
+            fprintf(file, "\"%s\"", child->inner_text);
+            if (i != child->parent->children.size() - 1)
+            {
+                fprintf(file, ",\n");
+            }
+            else
+            {
+                fprintf(file, "\n");
+            }
+
+            if (child->flag == 4)
+            {
+                fprintf(file, "%0*s", indent * times + 1, " ");
+                fprintf(file, "]\n");
+            }
+        }
+        else
+        {
+            if (are_same_children(child) && child->flag == 0)
+            {
+                child->flag = 3;
+                fprintf(file, "\"%s\" :{", child->tag);
+            }
+            else
+            {
+                if (child->flag == 2)
+                {
+                    fprintf(file, "\"%s\":[", child->tag);
+                    fprintf(file, "%0*s", indent * times, " ");
+                }
+                else if (child->flag == 3)
+                {
+                }
+                else if (child->flag != 1 && child->flag != 4)
+                {
+                    if (i == 0 && child->parent->flag != 3 && child->parent->flag != 0)
+                    {
+                        fprintf(file, "{\n");
+                        fprintf(file, "%0*s", indent * times, " ");
+                    }
+                    fprintf(file, "\"%s\": ", child->tag);
+                }
+            }
+            fprintf(file, "\n");
+            JSON(file, child, indent, times + 1);
+            if (times > 0)
+            {
+                fprintf(file, "%0*s", indent * times, " ");
+            }
+
+            if (i != child->parent->children.size() - 1)
+            {
+                fprintf(file, "},\n");
+            }
+            else
+            {
+                fprintf(file, "}\n");
+            }
+            if (child->flag == 4)
+            {
+                fprintf(file, "%0*s", indent * times - 2, " ");
+                fprintf(file, "]\n");
+            }
+        }
+    }
+}
+
 void XMLDocument::Format(FILE *file, XMLNode *node, int indent, int times)
 {
     for (int i = 0; i < node->children.size(); i++)

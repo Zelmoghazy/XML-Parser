@@ -1,4 +1,4 @@
-#include "XMLDocument.h"
+#include "XMLNode.h"
 
 class Graph{
 private:

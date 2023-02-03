@@ -26,8 +26,26 @@ All these functionalities should be accessed from a GUI
 -	Codes regarding GUI.
 
 ##Algorithm
+
+
 ![image](https://user-images.githubusercontent.com/104307082/216668671-b0606115-2803-42f2-bce9-a3abe6b01d83.png)
 
-#First:
 You can write an XML code in the text area shown or you can load an XML file by pressing on choose file button.
+
+#functionalities
+- Parse XML
+By clicking on this button XMLDocument_parse("file path") is called this method checks balance and errors and extracts the data from XML file to a tree structure. This method uses checkBalance(std::string, int) as a helper method for checking the XML balance.
+- Compress
+With pressing the compress button, we pass the xml data to compression function, getting the unique data and frequency, use the Huffman code algorithm to make the codes of unique data, encode the xml data to zeroes and ones, and compress those zeroes and ones by tacking every 7 bits and convert them into character data type. Finally put the unique data and their codes in the first line, then put the encoded data as char in the next line.
+- Decompress
+With pressing the decompress button, the first line is the data codes and the unique data (as explained), so we insert them to a binary tree, then get the next line, which is the encoded data, convert it into binary, then traverse this binary code by the binary tree to decode it into xml data.
+- Prettify
+By pressing this button XMLDocument_write method is invoked which accordingly calls Format method which iterates recursively over each parent node and through a loop goes over each child and prints it with proper indentation and through each recursion it increases the indentation depending on the depth of nesting, we also added that if a tag inner text exceeds 200 characters its printed in a new line to improve readability.
+- Minify
+By pressing this button XMLDocument_write method is invoked which accordingly calls Minify method which Goes in the same way as format, but it prints everything in one line with no indentation.
+- To Json
+By pressing this button XMLDocument_write method is invoked which accordingly calls JSON method.
+Due to differences between xml files and Json, we marked each node if it had children with the same tag, it only prints the tag one time and add the inner texts to an array, the indentation is similar to the format option.
+- Post Search
+It simply takes a word or sub string as an argument and searches in the whole posts in the network to get a post containing this word or a topic speaking about this word and returns a vector containing all posts related. 
 

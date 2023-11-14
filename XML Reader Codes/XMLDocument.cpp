@@ -78,6 +78,7 @@ bool XMLDocument::XMLDocument_parse(const char *path)
             break;
         source.push_back(ch);
     }
+    source.push_back('\0');
     fclose(file);
     /*-----------------------------------------------------*/
     // Create new root node (no parent)

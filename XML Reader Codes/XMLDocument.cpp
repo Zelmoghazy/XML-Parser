@@ -20,12 +20,13 @@ XMLNode* XMLDocument::get_user(unsigned int id)
 {
     return this->root->children[0]->children[id-1];
 }
-bool XMLDocument::checkBalance(std::string source, int n)
+
+bool XMLDocument::checkBalance(std::string source)
 {
     int opening = 0;
     int closing = 0;
     std::stack<int> s;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < source.size(); i++)
     {
         if (source[i] == '<')
         {
@@ -34,34 +35,26 @@ bool XMLDocument::checkBalance(std::string source, int n)
                 while(source[i] != '>'){
                     i++;
                 }
-            }
-            else
-            {
+            }else{
                 s.push('<');
-                if (source[i + 1] == '/')
-                {
+                if (source[i + 1] == '/'){
                     closing++;
-                }
-                else
-                {
+                }else{
                     opening++;
                 }
             }
         }
         else if (source[i] == '>')
         {
-            if (s.empty())
-            {
+            if (s.empty()){
                 return false;
             }
-            else if (s.top() == '<')
-            {
+            else if (s.top() == '<'){
                 s.pop();
             }
         }
     }
-    if (s.empty() && (closing - opening) == 0)
-    {
+    if (s.empty() && (closing - opening) == 0){
         return true;
     }
     return false;
@@ -71,31 +64,22 @@ bool XMLDocument::XMLDocument_parse(const char *path)
 {
     FILE *file = fopen(path, "r");
     // Check if file loads properly
-    if (!file)
-    {
+    if (!file){
         // output to stderr to seperate error messages from regular output
         fprintf(stderr, "Couldnt load file");
         return false;
     }
     std::string source;
-    int size = 1;
     char ch;
-    // count number of new lines
-    //  a new line is represented by two bytes in a text file,
-    //  but when reading it only yields a single '\n' character.
     while (file)
     {
         ch = fgetc(file);
         if (ch == EOF)
             break;
         source.push_back(ch);
-        size++;
     }
-    fread(&source[0], 1, size, file);
     fclose(file);
     /*-----------------------------------------------------*/
-    // null terminate
-    source[size] = '\0';
     // Create new root node (no parent)
     //------------------------------//
     this->root = new XMLNode(root);
@@ -109,12 +93,9 @@ bool XMLDocument::XMLDocument_parse(const char *path)
     XMLNode *curr_node = this->root;
     
      // check consistency
-    if (checkBalance(source, size))
-    {
+    if (checkBalance(source)){
         printf("the xml is balanced\n");
-    }
-    else
-    {
+    }else{
         printf("The XML is not balanced\n");
         //return false;
     }
@@ -122,7 +103,6 @@ bool XMLDocument::XMLDocument_parse(const char *path)
     // as long as we dont reach end of source array
     while (source[i] != '\0')
     {
-        
         // if we find an open tag
         if (source[i] == '<')
         {

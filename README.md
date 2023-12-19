@@ -69,3 +69,35 @@ taking two users id as parameters and returns the mutual users id.
 
 for a given user it iterates for his followers and search for a follower that is not a follower of the given node and returns a vector of suggested followers.
 
+## Snapshots
+
+<p align="center">
+  <img src="./Images/1.png"
+       width="100%" 
+       style="border-radius: 30px;"/>
+</p>
+<p align="center">
+  <img src="./Images/2.png"
+       width="100%" 
+       style="border-radius: 30px;"/>
+</p>
+<p align="center">
+  <img src="./Images/3.png"
+       width="100%" 
+       style="border-radius: 30px;"/>
+</p>
+<p align="center">
+  <img src="./Images/4.png"
+       width="100%" 
+       style="border-radius: 30px;"/>
+</p>
+<p align="center">
+  <img src="./Images/5.png"
+       width="100%" 
+       style="border-radius: 30px;"/>
+</p>
+<p align="center">
+  <img src="./Images/6.png"
+       width="100%" 
+       style="border-radius: 30px;"/>
+</p>

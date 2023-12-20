@@ -73,31 +73,31 @@ for a given user it iterates for his followers and search for a follower that is
 
 <p align="center">
   <img src="./Images/1.png"
-       width="100%" 
+       width="50%" 
        style="border-radius: 30px;"/>
 </p>
 <p align="center">
   <img src="./Images/2.png"
-       width="100%" 
+       width="50%" 
        style="border-radius: 30px;"/>
 </p>
 <p align="center">
   <img src="./Images/3.png"
-       width="100%" 
+       width="50%" 
        style="border-radius: 30px;"/>
 </p>
 <p align="center">
   <img src="./Images/4.png"
-       width="100%" 
+       width="50%" 
        style="border-radius: 30px;"/>
 </p>
 <p align="center">
   <img src="./Images/5.png"
-       width="100%" 
+       width="50%" 
        style="border-radius: 30px;"/>
 </p>
 <p align="center">
   <img src="./Images/6.png"
-       width="100%" 
+       width="50%" 
        style="border-radius: 30px;"/>
 </p>
